@@ -4,7 +4,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import html as html_module
 
-
 from utils import api
 
 # -------------------- PAGE CONFIG --------------------
@@ -15,12 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
-
 # -------------------- SESSION STATE --------------------
-if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
-
 if "result" not in st.session_state:
     st.session_state.result = None
 
@@ -83,15 +77,19 @@ print(total_even)""",
 print(count_primes_below(500))""",
 }
 
+# -------------------- THEME (always dark) --------------------
+BG = "#0B0F19"
+CARD = "rgba(17,24,39,0.8)"
+TEXT = "#E6E8EC"
+ACCENT = "#00F5FF"
+GRAPH_FONT = "#E6E8EC"
 
 # -------------------- GLOBAL STYLING --------------------
 st.markdown(f"""
 <style>
 
-/* Keep sidebar toggle visible */
 #MainMenu, footer {{visibility:hidden;}}
 
-/* Proper centering behaviour */
 .block-container {{
     max-width: 1200px;
     margin-left: auto;
@@ -190,7 +188,6 @@ html, body, [class*="css"] {{
 # -------------------- SIDEBAR CONTENT --------------------
 with st.sidebar:
     st.title("Navigation")
-    
     st.write("---")
 
     # Backend health check
@@ -216,17 +213,8 @@ with st.sidebar:
         st.caption("No optimization history yet.")
 
 # -------------------- HEADER --------------------
-header_left, header_right = st.columns([8,2])
-
-with header_left:
-    st.markdown("<div class='codeforge-title'>CODEFORGE</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>Shaping Faster. Smarter. Leaner Code.</div>", unsafe_allow_html=True)
-
-with header_right:
-    st.button(button_label, on_click=switch_theme)
-    if st.button("Logout"):
-        from utils.auth import logout
-        logout()
+st.markdown("<div class='codeforge-title'>CODEFORGE</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Shaping Faster. Smarter. Leaner Code.</div>", unsafe_allow_html=True)
 
 st.divider()
 
@@ -251,7 +239,6 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("### Input Code")
 
-    # Pre-fill from uploaded file or example
     default_code = ""
     if uploaded_file is not None:
         default_code = uploaded_file.read().decode("utf-8")
@@ -286,7 +273,6 @@ if run and code_input.strip():
             result = api.api_client.optimize_rules_only(code_input)
         st.session_state.result = result
 
-        # Track history
         if result and not result.get("error"):
             benchmarks = result.get("benchmarks", {})
             st.session_state.history.append({
@@ -341,7 +327,6 @@ if result and result.get("optimized_code"):
             st.markdown("**Optimized**")
             st.code(optimized_code, language="python")
 
-        # Show explainability diff if available
         explainability = result.get("explainability")
         if explainability:
             transform = explainability.get("transformation", {})
@@ -388,12 +373,11 @@ if result and result.get("optimized_code"):
                 color = ACCENT
                 if speed is not None:
                     if speed >= 1.5:
-                        color = "#22C55E"  # green
+                        color = "#22C55E"
                     elif speed < 1.0:
-                        color = "#EF4444"  # red - slower
+                        color = "#EF4444"
                 st.markdown(f"<div class='metric-card'><div>Speedup Factor</div><div class='metric-value' style='color:{color}'>{speedup_text}</div></div>", unsafe_allow_html=True)
 
-            # Memory metrics
             mem1, mem2 = st.columns(2)
             with mem1:
                 orig_mem_text = f"{orig_mem:.2f} MB" if orig_mem is not None else "N/A"
@@ -402,13 +386,11 @@ if result and result.get("optimized_code"):
                 opt_mem_text = f"{opt_mem:.2f} MB" if opt_mem is not None else "N/A"
                 st.markdown(f"<div class='metric-card'><div>Optimized Memory</div><div class='metric-value'>{opt_mem_text}</div></div>", unsafe_allow_html=True)
 
-            # Variance info
             orig_var = orig.get("variance_pct", 0)
             opt_var = opt.get("variance_pct", 0)
             if orig_var or opt_var:
                 st.caption(f"Benchmark variance: Original {orig_var}% | Optimized {opt_var}%")
 
-            # Gauge
             if speed is not None:
                 fig_gauge = go.Figure(go.Indicator(
                     mode="gauge+number",
@@ -424,19 +406,15 @@ if result and result.get("optimized_code"):
                         ],
                     }
                 ))
-
                 fig_gauge.update_layout(
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
                     font_color=GRAPH_FONT,
                     height=350
                 )
-
                 st.plotly_chart(fig_gauge, use_container_width=True)
 
-            # Bar Charts
             st.markdown("### Performance Comparison")
-
             c1, c2 = st.columns(2)
 
             if orig_ms is not None and opt_ms is not None:
@@ -485,7 +463,6 @@ if result and result.get("optimized_code"):
             opt_cx = complexity_data.get("optimized", {})
 
             st.markdown("### Code Complexity Analysis")
-
             cx1, cx2 = st.columns(2)
 
             with cx1:
@@ -510,7 +487,6 @@ if result and result.get("optimized_code"):
                     <b>Big-O Estimate:</b> {html_module.escape(str(opt_cx.get('big_o_estimate', '?')))}
                 </div>""", unsafe_allow_html=True)
 
-            # Complexity comparison chart
             if orig_cx and opt_cx:
                 metrics_list = ["cyclomatic_complexity", "max_nesting_depth", "num_loops", "lines_of_code"]
                 labels = ["Cyclomatic", "Max Depth", "Loops", "LOC"]
@@ -551,7 +527,6 @@ if result and result.get("optimized_code"):
                 </div>
                 """, unsafe_allow_html=True)
 
-            # Show transformations applied
             transformations = result.get("transformations", [])
             if transformations:
                 st.markdown("---")
@@ -612,6 +587,5 @@ if result and result.get("optimized_code"):
         else:
             st.info("AI explanation not available. Configure Gemini API key for detailed analysis.")
 
-    # ---- Mode indicator ----
     mode = result.get("mode", "UNKNOWN")
     st.caption(f"Mode: {mode} | Timestamp: {result.get('timestamp', 'N/A')}")
