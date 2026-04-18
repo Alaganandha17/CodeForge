@@ -1,0 +1,21 @@
+# CodeForge Requirements (Frontend + Backend)
+
+# Frontend - UI
+streamlit>=1.32.0
+plotly>=5.18.0
+pandas>=2.2.0
+
+# API Communication
+requests>=2.31.0
+
+# Backend
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+python-dotenv>=1.0.0
+numpy>=1.26.0
+
+# AI (optional - for hybrid mode)
+google-genai>=1.0.0
+cffi>=1.0.0
