@@ -83,25 +83,6 @@ print(total_even)""",
 print(count_primes_below(500))""",
 }
 
-# -------------------- THEME TOGGLE --------------------
-def switch_theme():
-    st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-
-# -------------------- THEME COLORS --------------------
-if st.session_state.theme == "dark":
-    BG = "#0B0F19"
-    CARD = "rgba(17,24,39,0.8)"
-    TEXT = "#E6E8EC"
-    ACCENT = "#00F5FF"
-    GRAPH_FONT = "#E6E8EC"
-    button_label = "Light Mode"
-else:
-    BG = "#F5F7FA"
-    CARD = "rgba(255,255,255,0.95)"
-    TEXT = "#111827"
-    ACCENT = "#2563EB"
-    GRAPH_FONT = "#111827"
-    button_label = "Dark Mode"
 
 # -------------------- GLOBAL STYLING --------------------
 st.markdown(f"""
